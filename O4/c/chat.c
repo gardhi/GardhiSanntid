@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <pthread.h>
 
-#define SERVER "129.241.187.157"
+#define SERVER "129.241.187.140"
 #define BUFLEN 512  //Max length of buffer
 #define PORT 2020   //The port on which to send data
  
@@ -19,7 +19,7 @@ void die(char *s)
 }
 
 
-void* server(){
+void* UDP_recieve(){
 
 	struct sockaddr_in si_me, si_other;
      
@@ -51,21 +51,27 @@ void* server(){
         printf("Waiting for data...");
         fflush(stdout);
          
+        //clear the buffer by filling null, it might have previously received data
+        memset(buf,'\0', BUFLEN);
+
         //try to receive some data, this is a blocking call
         if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1)
         {
             die("recvfrom()");
         }
-         
+
+
         //print details of the client/peer and the data received
-        printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-        printf("Data: %s\n" , buf);
-         
+        printf("From %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+        printf("Msg: %s\n" , buf);
+             
+
         //now reply the client with the same data
+        /*
         if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1)
         {
             die("sendto()");
-        }
+        }*/
     }
  
     close(s);
@@ -73,7 +79,7 @@ void* server(){
 }
  
 
-void* client(){
+void* UDP_send(){
 
     struct sockaddr_in si_other;
     int s, i, slen=sizeof(si_other);
@@ -106,16 +112,18 @@ void* client(){
             die("sendto()");
         }
          
+        /*
         //receive a reply and print it
         //clear the buffer by filling null, it might have previously received data
+        
         memset(buf,'\0', BUFLEN);
         //try to receive some data, this is a blocking call
         if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen) == -1)
         {
             die("recvfrom()");
         }
-         
         puts(buf);
+        */
     }
  
     close(s);
@@ -124,8 +132,16 @@ void* client(){
 
 int main(){
 
+    pthread_t send_thr;
+    pthread_t receive_thr;
 
-	printf("YOLO\n");
+	pthread_create(&receive_thr,NULL, UDP_recieve, NULL);
+    pthread_create(&send_thr,NULL, UDP_send, NULL);
 
+    pthread_join(send_thr,NULL);
+    pthread_join(receive_thr, NULL);
+
+
+    return 0;
 
 }
