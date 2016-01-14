@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-c -Wall -std=gnu11 -fsanitize=thread -fPIC
-LDFLAGS= -fsanitize=thread -pie -lpthread
+CFLAGS=-c -Wall -std=gnu11
+LDFLAGS= -lpthread
 SOURCES=count.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=count

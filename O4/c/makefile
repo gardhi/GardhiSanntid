@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-c -Wall -std=gnu11 -fsanitize=thread -fPIC
-LDFLAGS= -fsanitize=thread -pie -lpthread
-SOURCES=count.c
+CFLAGS=-c -Wall -std=gnu11
+LDFLAGS= -lpthread
+SOURCES=chat.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=count
+EXECUTABLE=chat
 
 all: $(SOURCES) $(EXECUTABLE)
 	
